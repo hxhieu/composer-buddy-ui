@@ -1,6 +1,6 @@
 <template>
   <Nav />
-  <RouterView class="max-w-3xl m-auto" />
+  <RouterView class="max-w-screen-xl m-auto" />
 </template>
 
 <script lang="ts">
