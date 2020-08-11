@@ -1,18 +1,14 @@
 <template>
-  <nav class="flex items-center justify-between flex-wrap bg-primary p-4">
+  <nav
+    class="flex items-center justify-between flex-wrap bg-primary dark:bg-primary-dark p-4"
+  >
     <router-link to="/" class="flex items-center flex-shrink-0 text-white mr-6">
-      <svg
-        class="fill-current h-8 w-8 mr-2"
-        width="54"
-        height="54"
-        viewBox="0 0 54 54"
-        xmlns="http://www.w3.org/2000/svg"
+      <div
+        class="flex flex-col text-center text-white dark:text-text-primary-dark"
       >
-        <path
-          d="M13.5 22.1c1.8-7.2 6.3-10.8 13.5-10.8 10.8 0 12.15 8.1 17.55 9.45 3.6.9 6.75-.45 9.45-4.05-1.8 7.2-6.3 10.8-13.5 10.8-10.8 0-12.15-8.1-17.55-9.45-3.6-.9-6.75.45-9.45 4.05zM0 38.3c1.8-7.2 6.3-10.8 13.5-10.8 10.8 0 12.15 8.1 17.55 9.45 3.6.9 6.75-.45 9.45-4.05-1.8 7.2-6.3 10.8-13.5 10.8-10.8 0-12.15-8.1-17.55-9.45-3.6-.9-6.75.45-9.45 4.05z"
-        />
-      </svg>
-      <span class="font-semibold text-xl tracking-tight">Composer Buddy</span>
+        <span class="font-semibold text-xl tracking-tight">Composer Buddy</span>
+        <span class="text-xs">0.1.0.adf267</span>
+      </div>
     </router-link>
     <div class="block lg:hidden">
       <button
@@ -30,23 +26,21 @@
     </div>
     <div class="w-full block flex-grow lg:flex lg:items-center lg:w-auto">
       <div class="text-sm lg:flex-grow">
-        <router-link
-          to="/projects"
-          class="block text-lg mt-4 lg:inline-block lg:mt-0 text-teal-200 hover:text-white mr-4"
-          >Projects</router-link
-        >
-        <router-link
-          to="/aaa"
-          class="block text-lg mt-4 lg:inline-block lg:mt-0 text-teal-200 hover:text-white mr-4"
-          >Examples</router-link
-        >
-        <router-link
-          to="/bbb"
-          class="block text-lg mt-4 lg:inline-block lg:mt-0 text-teal-200 hover:text-white"
-          >Blog</router-link
-        >
+        <NavLink path="/projects" label="Projects" />
+        <NavLink path="/projects1" label="Examples" />
+        <NavLink path="/projects2" label="Blogs" />
       </div>
-      <div class="text-white text-sm">v0.1.0.adf267</div>
     </div>
   </nav>
 </template>
+
+<script lang="ts">
+import { defineComponent } from 'vue'
+import NavLink from './NavLink.vue'
+export default defineComponent({
+  name: 'Nav',
+  components: {
+    NavLink,
+  },
+})
+</script>

@@ -17,6 +17,7 @@
   },
   "devDependencies": {
     "@vue/compiler-sfc": "^3.0.0-rc.1",
+    "tailwindcss-dark-mode": "^1.1.6",
     "typescript": "^3.9.7",
     "vite": "^1.0.0-rc.1"
   },
