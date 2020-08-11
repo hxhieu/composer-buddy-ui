@@ -1,15 +1,16 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png" />
-  <HelloWorld msg="Hello Vue 3.0 + Vite" />
+  <Nav />
+  <RouterView class="max-w-3xl m-auto" />
 </template>
 
-<script>
-import HelloWorld from './components/HelloWorld.vue'
+<script lang="ts">
+import { defineComponent } from 'vue'
+import Nav from './components/Nav.vue'
 
-export default {
+export default defineComponent({
   name: 'App',
   components: {
-    HelloWorld,
+    Nav,
   },
-}
+})
 </script>

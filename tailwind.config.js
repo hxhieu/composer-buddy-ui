@@ -1,4 +1,4 @@
-const defaultTheme = require('tailwindcss/defaultTheme')
+const { fontFamily, colors } = require('tailwindcss/defaultTheme')
 
 module.exports = {
   purge: {
@@ -13,7 +13,11 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Inter', ...defaultTheme.fontFamily.sans],
+        sans: ['Inter', ...fontFamily.sans],
+      },
+      colors: {
+        primary: colors.blue['400'],
+        // secondary: colors.white,
       },
     },
   },
