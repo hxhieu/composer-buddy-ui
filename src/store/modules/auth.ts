@@ -1,4 +1,5 @@
 import { Commit } from 'vuex'
+import { router } from '../../router'
 import { useHttpClient } from '../../composables/useHttpClient'
 import { ILoginRequest } from '../../models'
 import { AUTH_SET_TOKEN } from '../types'
@@ -29,9 +30,11 @@ const actions = {
       password,
     })
     commit(AUTH_SET_TOKEN, accessToken)
+    router.replace('/')
   },
   logout: ({ commit }: { commit: Commit }) => {
     commit(AUTH_SET_TOKEN, '')
+    router.replace('/login')
   },
 }
 
