@@ -1,8 +1,7 @@
 <template>
   <div>
     <PageHeading>
-      {{ editMode ? `Edit Project ` : 'Add Project '
-      }}{{ `(name: ${model.name})` }}
+      {{ editMode ? `Edit Project ` : 'Add Project ' }}{{ `(name: ${name})` }}
     </PageHeading>
     <div class="w-full max-w-md m-auto">
       <form
@@ -12,11 +11,12 @@
           <label
             class="block text-text-primary dark:text-text-primary-dark text-sm font-bold mb-2"
             for="name"
-            >Project Name</label
+            >Project Name<span class="form-asterisk">*</span></label
           >
           <input
-            v-model="model.name"
-            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            v-model="name"
+            class="shadow border-2 appearance-none rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            :class="validName ? '' : 'border-red-700'"
             type="text"
           />
         </div>
@@ -24,13 +24,14 @@
           <label
             class="block text-text-primary dark:text-text-primary-dark text-sm font-bold mb-2"
             for="name"
-            >Composer YML</label
+            >Composer YML<span class="form-asterisk">*</span></label
           >
           <input
-            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            class="shadow appearance-none border-2 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            :class="validFile ? '' : 'border-red-700'"
             type="file"
             @change="fileBrowser"
-            accept=".yaml,.yml"
+            accept=".yaml, .yml"
           />
         </div>
         <div class="mb-4">
@@ -40,7 +41,7 @@
             >Up Command</label
           >
           <input
-            v-model="model.up"
+            v-model="up"
             class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             type="text"
           />
@@ -52,15 +53,19 @@
             >Down Command</label
           >
           <input
-            v-model="model.down"
+            v-model="down"
             class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             type="text"
           />
         </div>
         <div class="text-center">
           <button
-            @click="login"
-            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            :disabled="!validAll"
+            @click="save"
+            class="hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            :class="
+              !validAll ? 'bg-gray-500 cursor-not-allowed' : 'bg-blue-500 '
+            "
             type="button"
           >
             Save
@@ -74,28 +79,54 @@
 <script lang="ts">
 import { defineComponent, computed, ref, reactive } from 'vue'
 import { useRoute } from 'vue-router'
+import { useHttpClient } from '../composables/useHttpClient'
+import { IHttpResponse, IProject } from '../models'
 
 export default defineComponent({
   name: 'Project',
   setup(props) {
     const route = useRoute()
-    const name = route.params.name as string
-    const editMode = computed(() => !!name)
+    // Model
+    const name = ref<string>(route.params.name as string)
+    const editMode = ref<boolean>(!!name.value)
+    const up = ref('docker-compose up -d')
+    const down = ref('docker-compose down --remove-orphans')
+    const dockerCompose = ref<Blob>()
+
+    const validName = computed(() => !!name.value)
+    const validFile = computed(() => !!dockerCompose.value)
+    const validAll = computed(() => validName.value && validFile.value)
 
     const fileBrowser = (evt: any) => {
-      console.log(evt.target.files)
+      dockerCompose.value = evt.target.files[0]
     }
 
-    const model = reactive({
-      name,
-      up: 'docker-compose up -d',
-      down: 'docker-compose down --remove-orphans',
-    })
+    const save = async () => {
+      const { post, patch } = useHttpClient()
+      const request = editMode.value ? patch : post
+
+      if (validAll.value) {
+        const data = new FormData()
+        data.append('name', name.value)
+        data.append('up', up.value)
+        data.append('down', down.value)
+        if (dockerCompose.value)
+          data.append('dockerCompose', dockerCompose.value)
+
+        await request<any, FormData>('project', data)
+      }
+    }
 
     return {
-      model,
+      name,
+      up,
+      down,
       editMode,
       fileBrowser,
+      save,
+      validName,
+      validFile,
+      validAll,
     }
   },
 })

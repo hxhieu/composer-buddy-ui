@@ -1,12 +1,16 @@
 import axios from 'axios'
-import store from '../store'
-import { IHttpResponse } from '../models'
 
-const createClient = () => {
+import { IHttpResponse } from '../models'
+import store from '../store'
+
+const createClient = (headers: any = {}) => {
   const { app, auth } = store.state as any
   return axios.create({
     baseURL: `${app.apiBaseUrl}/`,
-    headers: { Authorization: `Bearer ${auth.accessToken}` },
+    headers: {
+      ...headers,
+      Authorization: `Bearer ${auth.accessToken}`,
+    },
   })
 }
 
@@ -20,7 +24,11 @@ const get = async <T>(api: string): Promise<T> =>
 
 const post = async <T, P>(api: string, payload: P): Promise<T> =>
   new Promise((resolve) => {
-    createClient()
+    createClient(
+      payload instanceof FormData
+        ? { 'Content-Type': 'multipart/form-data' }
+        : { 'Content-Type': 'application/json' }
+    )
       .post<IHttpResponse<T>>(api, payload)
       .then((result) => resolve(result.data.data))
       .catch((err) => {
@@ -30,10 +38,14 @@ const post = async <T, P>(api: string, payload: P): Promise<T> =>
       })
   })
 
-const put = async <T, P>(api: string, payload: P): Promise<T> =>
+const patch = async <T, P>(api: string, payload: P): Promise<T> =>
   new Promise((resolve) => {
-    createClient()
-      .put<IHttpResponse<T>>(api, payload)
+    createClient(
+      payload instanceof FormData
+        ? { 'Content-Type': 'multipart/form-data' }
+        : { 'Content-Type': 'application/json' }
+    )
+      .patch<IHttpResponse<T>>(api, payload)
       .then((result) => resolve(result.data.data))
       .catch((err) => {
         // TODO: Toast
@@ -57,6 +69,6 @@ const del = async <T>(api: string): Promise<T> =>
 export const useHttpClient = () => ({
   get,
   post,
-  put,
+  patch,
   del,
 })
