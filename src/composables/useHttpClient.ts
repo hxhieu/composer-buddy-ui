@@ -1,4 +1,4 @@
-import axios from 'axios'
+import axios, { AxiosError, AxiosResponse } from 'axios'
 
 import { IHttpResponse } from '../models'
 import store from '../store'
@@ -14,12 +14,26 @@ const createClient = (headers: any = {}) => {
   })
 }
 
+const parseError = (err: AxiosError<IHttpResponse<any>>) => {
+  let msg = 'Unknown error'
+  let status = 'UNKNOWN'
+  if (err.response) {
+    msg = err.response.data.error
+    status = `${err.response.status} - ${err.response.statusText}`
+  }
+  return `${status} - ${msg}`
+}
+
 const get = async <T>(api: string): Promise<T> =>
   new Promise((resolve) => {
     createClient()
       .get<IHttpResponse<T>>(api)
       .then((result) => resolve(result.data.data))
-      .catch((err) => {})
+      .catch((err: AxiosError<IHttpResponse<any>>) => {
+        // TODO: Toast
+        alert(parseError(err))
+        resolve()
+      })
   })
 
 const post = async <T, P>(api: string, payload: P): Promise<T> =>
@@ -31,9 +45,9 @@ const post = async <T, P>(api: string, payload: P): Promise<T> =>
     )
       .post<IHttpResponse<T>>(api, payload)
       .then((result) => resolve(result.data.data))
-      .catch((err) => {
+      .catch((err: AxiosError<IHttpResponse<any>>) => {
         // TODO: Toast
-        alert(err)
+        alert(parseError(err))
         resolve()
       })
   })
@@ -49,7 +63,7 @@ const patch = async <T, P>(api: string, payload: P): Promise<T> =>
       .then((result) => resolve(result.data.data))
       .catch((err) => {
         // TODO: Toast
-        alert(err)
+        alert(parseError(err))
         resolve()
       })
   })
@@ -61,7 +75,7 @@ const del = async <T>(api: string): Promise<T> =>
       .then((result) => resolve(result.data.data))
       .catch((err) => {
         // TODO: Toast
-        alert(err)
+        alert(parseError(err))
         resolve()
       })
   })

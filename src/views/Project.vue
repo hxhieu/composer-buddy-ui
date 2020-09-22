@@ -38,7 +38,7 @@
           <label
             class="block text-text-primary dark:text-text-primary-dark text-sm font-bold mb-2"
             for="name"
-            >Up Command</label
+            >Up Args</label
           >
           <input
             v-model="up"
@@ -50,7 +50,7 @@
           <label
             class="block text-text-primary dark:text-text-primary-dark text-sm font-bold mb-2"
             for="name"
-            >Down Command</label
+            >Down Args</label
           >
           <input
             v-model="down"
@@ -78,19 +78,20 @@
 
 <script lang="ts">
 import { defineComponent, computed, ref, reactive } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useHttpClient } from '../composables/useHttpClient'
-import { IHttpResponse, IProject } from '../models'
+import { IHttpResponse } from '../models'
 
 export default defineComponent({
   name: 'Project',
   setup(props) {
     const route = useRoute()
+    const router = useRouter()
     // Model
     const name = ref<string>(route.params.name as string)
     const editMode = ref<boolean>(!!name.value)
-    const up = ref('docker-compose up -d')
-    const down = ref('docker-compose down --remove-orphans')
+    const up = ref('-d')
+    const down = ref('--remove-orphans')
     const dockerCompose = ref<Blob>()
 
     const validName = computed(() => !!name.value)
@@ -113,7 +114,12 @@ export default defineComponent({
         if (dockerCompose.value)
           data.append('dockerCompose', dockerCompose.value)
 
-        await request<any, FormData>('project', data)
+        const result = await request<any, FormData>('project', data)
+        if (result) {
+          // TODO: Toast
+          alert(`The project '${name.value}' has been created successfully.`)
+          router.push('/')
+        }
       }
     }
 
