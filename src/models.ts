@@ -7,3 +7,7 @@ export interface ILoginRequest {
   user: string
   password: string
 }
+
+export interface ICreateProjectResult {
+  name: string
+}

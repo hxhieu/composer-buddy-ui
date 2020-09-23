@@ -80,7 +80,7 @@
 import { defineComponent, computed, ref, reactive } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useHttpClient } from '../composables/useHttpClient'
-import { IHttpResponse } from '../models'
+import { ICreateProjectResult, IHttpResponse } from '../models'
 
 export default defineComponent({
   name: 'Project',
@@ -114,10 +114,13 @@ export default defineComponent({
         if (dockerCompose.value)
           data.append('dockerCompose', dockerCompose.value)
 
-        const result = await request<any, FormData>('project', data)
+        const result = await request<ICreateProjectResult, FormData>(
+          'project',
+          data
+        )
         if (result) {
           // TODO: Toast
-          alert(`The project '${name.value}' has been created successfully.`)
+          alert(`The project '${result.name}' has been created successfully.`)
           router.push('/')
         }
       }
